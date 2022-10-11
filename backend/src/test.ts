@@ -1,9 +1,11 @@
 import db from '../db/db'
-
+import jwt from 'jsonwebtoken'
 async function main() {
-    const alreadyExists = await db.user.findFirst({
-        where: { phoneNumber: '+2121312' },
+    const PRIVATE_KEY = 'dsadsadsadsa'
+    const token = jwt.sign({ a: 2 }, PRIVATE_KEY as string, {
+        expiresIn: '8760h',
     })
-    console.log('alreadyExists', alreadyExists)
+    const decoded = jwt.verify(token, PRIVATE_KEY)
+    console.log('decoded', decoded)
 }
 main()

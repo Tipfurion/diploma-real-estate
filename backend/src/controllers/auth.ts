@@ -1,23 +1,28 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { Request, Response } from 'express'
-
-import { authUtils } from './utils'
-
+import * as _ from 'lodash'
+import validate from '../services/validator'
+import db from '../../db/db'
 const SALT_ROUNDS = 10
 
 const authService = {
     register: async (req: Request, res: Response) => {
-        let { password, email } = req.body
+        let { password, phone } = req.body
+        if (!password || !phone) {
+            return res.status(400).json({
+                error: { message: 'Неверные параметры' },
+                data: null,
+            })
+        }
         try {
-            email = String(email).toLowerCase()
-            if (!authUtils.validateEmail(email)) {
+            if (!validate.phone(phone)) {
                 return res.status(400).json({
-                    error: { message: 'Неверный формат эл. почты' },
+                    error: { message: 'Не валидный номер телефона' },
                     data: null,
                 })
             }
-            if (!authUtils.validatePassword(password)) {
+            if (!validate.password(password)) {
                 return res.status(400).json({
                     error: { message: 'Пароль должен быть больше 6 символов' },
                     data: null,
@@ -25,30 +30,23 @@ const authService = {
             }
             const salt = bcrypt.genSaltSync(SALT_ROUNDS)
             const hash = bcrypt.hashSync(password, salt)
-            const alreadyExists = (
-                await db('users').select(['email']).where({ email })
-            ).length
+            const alreadyExists = await db.user.findFirst({
+                where: { phoneNumber: phone },
+            })
+
             if (alreadyExists) {
                 return res.status(400).json({
-                    error: { message: 'Аккаунт с такой почтой уже существует' },
+                    error: { message: 'Номер телефона занят' },
                     data: null,
                 })
             }
-            const name = email
-            const nickname = email
-            const id = authUtils.genUserId()
-            const imgUrl = authUtils.genImgUrl(name)
-            await db('users').insert({
-                id,
-                name,
-                nickname,
-                email,
-                password_hash: hash,
-                img_url: imgUrl,
-                created_at: db.fn.now(),
-                utm_source: utmSource,
+            const user = await db.user.create({
+                data: { passwordHash: hash, phoneNumber: phone },
             })
-            return res.json({ message: 'ok' })
+            return res.json({
+                error: null,
+                data: user,
+            })
         } catch (err) {
             return res.status(500).json({
                 error: { message: 'internal server error' },
@@ -57,61 +55,38 @@ const authService = {
         }
     },
     login: async (req: Request, res: Response) => {
-        let { password, email } = req.body
+        let { password, phone } = req.body
+        if (!password || !phone) {
+            return res.status(400).json({
+                error: { message: 'Неверные параметры' },
+                data: null,
+            })
+        }
         try {
-            email = String(email).toLowerCase()
-            if (!authUtils.validateEmail(email)) {
+            if (!validate.phone(phone)) {
                 return res.status(400).json({
-                    error: { message: 'Неверный формат эл. почты' },
+                    error: { message: 'Не валидный номер телефона' },
                     data: null,
                 })
             }
-            if (!authUtils.validatePassword(password)) {
+            if (!validate.password(password)) {
                 return res.status(400).json({
                     error: { message: 'Пароль должен быть больше 6 символов' },
                     data: null,
                 })
             }
-            const user = await db('users')
-                .select([
-                    'id',
-                    'name',
-                    'nickname',
-                    'img_url',
-                    'password_hash',
-                    'email',
-                ])
-                .where({ email })
-                .first()
+            const user = await db.user.findFirst({ where: { phoneNumber: phone } })
             if (!user) {
                 return res.status(403).json({
-                    error: { message: 'Неверная почта' },
+                    error: { message: 'Неверный телефон' },
                     data: null,
                 })
             }
-            if (!user.password_hash) {
-                return res.status(400).json({
-                    error: {
-                        message: `Ваш пароль не подходит! Нажмите на ссылку «Не помню пароль», чтобы зайти в систему.   
-                    Внимание! Пароли, созданные до 18 марта 2022 года, нужно изменить, так как мы заменили систему авторизации.`,
-                    },
-                    data: null,
+
+            if (bcrypt.compareSync(password, user.passwordHash)) {
+                const token = jwt.sign(_.omitBy(user, ['passwordHash']), process.env.JWT_PRIVATE_KEY as string, {
+                    expiresIn: process.env.JWT_EXPIRES_IN,
                 })
-            }
-            if (bcrypt.compareSync(password, user.password_hash)) {
-                const token = jwt.sign(
-                    {
-                        sub: user.id,
-                        name: user.name,
-                        nickname: user.nickname,
-                        email: user.email,
-                        imgUrl: user.img_url,
-                    },
-                    process.env.JWT_PRIVATE_KEY as string,
-                    {
-                        expiresIn: process.env.JWT_EXPIRES_IN,
-                    }
-                )
                 res.json({ error: null, data: { token } })
             } else {
                 res.status(403).json({
@@ -126,7 +101,7 @@ const authService = {
             })
         }
     },
-    resetPassword: async (req: Request, res: Response) => {
+    /*  resetPassword: async (req: Request, res: Response) => {
         let { email } = req.body
         try {
             email = String(email).toLowerCase()
@@ -136,9 +111,7 @@ const authService = {
                     data: null,
                 })
             }
-            const { id: userId } =
-                (await db('users').select(['id']).where({ email }).first()) ||
-                {}
+            const { id: userId } = (await db('users').select(['id']).where({ email }).first()) || {}
             if (!userId) {
                 return res.status(403).json({
                     error: { message: 'Неверная почта' },
@@ -148,9 +121,7 @@ const authService = {
             const newPassword = authUtils.generatePassword()
             const salt = bcrypt.genSaltSync(SALT_ROUNDS)
             const hash = bcrypt.hashSync(newPassword, salt)
-            await db('users')
-                .update({ password_hash: hash })
-                .where({ id: userId })
+            await db('users').update({ password_hash: hash }).where({ id: userId })
 
             return res.status(200).json({
                 error: null,
@@ -181,17 +152,14 @@ const authService = {
                 if (!authUtils.validatePassword(newPassword)) {
                     return res.status(400).json({
                         error: {
-                            message:
-                                'Новый пароль должен быть больше 6 символов',
+                            message: 'Новый пароль должен быть больше 6 символов',
                         },
                         data: null,
                     })
                 }
                 const salt = bcrypt.genSaltSync(SALT_ROUNDS)
                 const newPwdHash = bcrypt.hashSync(newPassword, salt)
-                await db('users')
-                    .update({ password_hash: newPwdHash })
-                    .where({ id: userId })
+                await db('users').update({ password_hash: newPwdHash }).where({ id: userId })
                 return res.json({ error: null, data: { message: 'ok' } })
             } else {
                 return res.status(403).json({
@@ -212,10 +180,7 @@ const authService = {
             const token = authHeader!.replace('Bearer ', '')
             if (token) {
                 try {
-                    const decoded = jwt.verify(
-                        token,
-                        process.env.JWT_PRIVATE_KEY as string
-                    )
+                    const decoded = jwt.verify(token, process.env.JWT_PRIVATE_KEY as string)
                     const user = decoded
                     res.status(200).json({ error: null, data: user })
                 } catch (err) {
@@ -239,6 +204,6 @@ const authService = {
     },
     logOut: (req: Request, res: Response) => {
         res.json({ error: null, data: { message: 'ok' } })
-    },
+    }, */
 }
 export default authService

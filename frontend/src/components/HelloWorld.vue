@@ -1,38 +1,46 @@
-<script setup lang="ts">
-import { ref } from 'vue'
-
-defineProps<{ msg: string }>()
-
-const count = ref(0)
-</script>
-
 <template>
-  <h1>{{ msg }}</h1>
-
-  <div class="card">
-    <button type="button" @click="count++">count is {{ count }}</button>
-    <p>
-      Edit
-      <code>components/HelloWorld.vue</code> to test HMR
-    </p>
-  </div>
-
-  <p>
-    Check out
-    <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank"
-      >create-vue</a
-    >, the official Vue + Vite starter
-  </p>
-  <p>
-    Install
-    <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar</a>
-    in your IDE for a better DX
-  </p>
-  <p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
+    <n-space>
+        <n-button :focusable="false">Default</n-button>
+        <n-button type="tertiary" ghost> Tertiary </n-button>
+        <n-button type="primary"> Primary </n-button>
+        <n-button type="info"> Info </n-button>
+        <n-button type="success"> Success </n-button>
+        <n-button type="warning"> Warning </n-button>
+        <n-button type="error"> Error </n-button>
+        <n-auto-complete
+            v-model:value="value"
+            :input-props="{
+                autocomplete: 'disabled',
+            }"
+            :options="options"
+            placeholder="Email"
+        />
+    </n-space>
 </template>
 
-<style scoped>
-.read-the-docs {
-  color: #888;
-}
-</style>
+<script lang="ts">
+import { defineComponent, computed, ref } from 'vue'
+import { NButton, NAutoComplete } from 'naive-ui'
+
+export default defineComponent({
+    components: {
+        NButton,
+        NAutoComplete,
+    },
+    setup(props) {
+        const valueRef = ref('')
+        return {
+            value: valueRef,
+            options: computed(() => {
+                return ['@gmail.com', '@163.com', '@qq.com'].map((suffix) => {
+                    const prefix = valueRef.value.split('@')[0]
+                    return {
+                        label: prefix + suffix,
+                        value: prefix + suffix,
+                    }
+                })
+            }),
+        }
+    },
+})
+</script>

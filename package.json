@@ -1,0 +1,18 @@
+{
+    "name": "diploma-real-estate",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index",
+    "scripts": {
+        "dev:frontend": "cd frontend && npm run dev",
+        "dev:backend": "cd backend && ts-node src/index",
+        "dev:db": "cd db && docker compose up",
+        "dev": "concurrently --kill-others \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:db\""
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "concurrently": "^7.4.0"
+    }
+}

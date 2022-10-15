@@ -15,6 +15,7 @@
             :options="options"
             placeholder="Email"
         />
+        <div v-for="i in Array.from({ length: 1000 })">1</div>
     </n-space>
 </template>
 

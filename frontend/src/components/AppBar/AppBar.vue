@@ -3,14 +3,21 @@
         <div class="app-bar__content-wrapper">
             <div>1</div>
             <div>2</div>
+            <n-avatar round size="large" @click="() => {}">
+                <n-icon>
+                    <person-16-regular />
+                </n-icon>
+            </n-avatar>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-
+import { Person16Regular } from '@vicons/fluent'
+import { NAvatar, NIcon } from 'naive-ui'
 export default defineComponent({
+    components: { NAvatar, NIcon, Person16Regular },
     setup() {
         return {}
     },

@@ -1,25 +1,46 @@
 <template>
     <div class="app-bar">
+        <AuthModal v-model:showModal="showAuthModal" />
         <div class="app-bar__content-wrapper">
-            <div>1</div>
-            <div>2</div>
-            <n-avatar round size="large" @click="() => {}">
-                <n-icon>
-                    <person-16-regular />
-                </n-icon>
-            </n-avatar>
+            <div class="app-bar__content">
+                <div class="element-group left">1</div>
+                <div class="element-group right">
+                    <n-button v-if="!logged" type="primary" strong :focusable="false" @click="showAuthModal = true"
+                        >ВОЙТИ</n-button
+                    >
+                    <n-avatar
+                        v-if="logged"
+                        round
+                        size="large"
+                        @click="() => {}"
+                        :style="{
+                            backgroundColor: theme.common.primaryColor,
+                        }"
+                    >
+                        <n-icon>
+                            <person-outline-filled />
+                        </n-icon>
+                    </n-avatar>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { Person16Regular } from '@vicons/fluent'
-import { NAvatar, NIcon } from 'naive-ui'
+import { defineComponent, ref, toRefs } from 'vue'
+import { PersonOutlineFilled } from '@vicons/material'
+import { NAvatar, NIcon, NButton } from 'naive-ui'
+import theme from '@/theme'
+import { useAuthStore } from '../../stores/authStore'
+import AuthModal from '../AuthModal.vue'
 export default defineComponent({
-    components: { NAvatar, NIcon, Person16Regular },
+    components: { NAvatar, NIcon, PersonOutlineFilled, NButton, AuthModal },
     setup() {
-        return {}
+        const authStore = useAuthStore()
+        const { logged } = toRefs(authStore)
+        const showAuthModal = ref(true)
+        return { theme, logged, showAuthModal }
     },
 })
 </script>
@@ -27,7 +48,7 @@ export default defineComponent({
 <style scoped lang="sass">
 @import '@/vars.sass'
 .app-bar
-    z-index: 10000
+    z-index: 1999
     position: fixed
     height: 56px
     width: 100%
@@ -39,4 +60,13 @@ export default defineComponent({
     &__content-wrapper
         max-width: 1016px
         flex-grow: 1
+    &__content
+        height: 100%
+        display: flex
+        justify-content: space-between
+        align-items: center
+.element-group
+    display: flex
+    justify-content: space-between
+    align-items: center
 </style>

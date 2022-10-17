@@ -39,7 +39,7 @@ export default defineComponent({
     setup() {
         const authStore = useAuthStore()
         const { logged } = toRefs(authStore)
-        const showAuthModal = ref(true)
+        const showAuthModal = ref(false)
         return { theme, logged, showAuthModal }
     },
 })

@@ -27,13 +27,13 @@
                         <n-input
                             class="auth__input"
                             v-model:value="password"
-                            type="text"
+                            type="password"
                             placeholder="Пароль"
                             size="large"
                         ></n-input>
                         <div class="change-state-wrapper">
                             <n-button class="auth-btn" type="primary" size="large">Войти </n-button>
-                            <n-text class="change-state-text" type="primary" underline @click="state = 'register'">
+                            <n-text class="change-state-text" type="primary" underline @click="changeState('register')">
                                 Зарегистрироваться
                             </n-text>
                         </div>
@@ -69,8 +69,10 @@
                             size="large"
                         ></n-input>
                         <div class="change-state-wrapper">
-                            <n-button class="auth-btn" type="primary" size="large">Зарегистрироваться </n-button>
-                            <n-text class="change-state-text" type="primary" underline @click="state = 'login'">
+                            <n-button @click="register" class="auth-btn" type="primary" size="large"
+                                >Зарегистрироваться
+                            </n-button>
+                            <n-text class="change-state-text" type="primary" underline @click="changeState('login')">
                                 Войти
                             </n-text>
                         </div>
@@ -84,6 +86,8 @@
 <script lang="ts">
 import { defineComponent, computed, ref, watch } from 'vue'
 import { NModal, NCard, NButton, NIcon, NInput, NText, NH1 } from 'naive-ui'
+import api from '@/api/index'
+type authState = 'login' | 'register'
 import { CloseFilled } from '@vicons/material'
 export default defineComponent({
     components: {
@@ -102,13 +106,29 @@ export default defineComponent({
         },
     },
     setup(props, { emit }) {
-        const state = ref<'login' | 'register'>('login')
+        const state = ref<authState>('login')
         const phone = ref('')
         const password = ref('')
         const repetedPassword = ref('')
-
+        const error = ref('')
         const updateShow = (val: boolean) => {
             emit('update:showModal', val)
+        }
+        const changeState = (val: authState) => {
+            phone.value = ''
+            password.value = ''
+            repetedPassword.value = ''
+            state.value = val
+        }
+        const register = async () => {
+            const { data, error } = await api.register({
+                phone: phone.value,
+                password: password.value,
+                repeatedPassword: repetedPassword.value,
+            })
+            if (error) {
+                error.value = error
+            }
         }
         watch(
             () => props.showModal,
@@ -119,7 +139,7 @@ export default defineComponent({
                 })
             }
         )
-        return { updateShow, phone, password, repetedPassword, state }
+        return { updateShow, changeState, register, phone, password, repetedPassword, state }
     },
 })
 </script>

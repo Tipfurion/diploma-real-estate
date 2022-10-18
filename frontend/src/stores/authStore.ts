@@ -5,6 +5,6 @@ export const useAuthStore = defineStore('auth', {
         logged: (state) => Boolean(state.user),
     },
     actions: {
-        increment() {},
+        async register() {},
     },
 })

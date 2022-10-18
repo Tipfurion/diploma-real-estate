@@ -4,18 +4,26 @@ import { Request, Response } from 'express'
 import * as _ from 'lodash'
 import validate from '../services/validator'
 import db from '../../db/db'
+import { omit, omitBy } from 'lodash'
 const SALT_ROUNDS = 10
 
 const authService = {
     register: async (req: Request, res: Response) => {
-        let { password, phone } = req.body
-        if (!password || !phone) {
-            return res.status(400).json({
-                error: { message: 'Неверные параметры' },
-                data: null,
-            })
-        }
         try {
+            let { password, repeatedPassword, phone } = req.body
+            if (!password || !phone || !repeatedPassword) {
+                return res.status(400).json({
+                    error: { message: 'Неверные параметры' },
+                    data: null,
+                })
+            }
+            if (password !== repeatedPassword) {
+                return res.status(400).json({
+                    error: { message: 'Пароли не совпадают' },
+                    data: null,
+                })
+            }
+
             if (!validate.phone(phone)) {
                 return res.status(400).json({
                     error: { message: 'Не валидный номер телефона' },
@@ -45,7 +53,7 @@ const authService = {
             })
             return res.json({
                 error: null,
-                data: user,
+                data: omit(user, ['passwordHash']),
             })
         } catch (err) {
             return res.status(500).json({

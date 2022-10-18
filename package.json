@@ -5,7 +5,7 @@
     "main": "index",
     "scripts": {
         "dev:frontend": "cd frontend && npm run dev",
-        "dev:backend": "cd backend && ts-node src/index",
+        "dev:backend": "cd backend && npm run dev",
         "dev:db": "cd db && docker compose up",
         "dev": "concurrently --kill-others \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:db\""
     },

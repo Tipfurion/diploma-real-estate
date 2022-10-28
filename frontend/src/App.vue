@@ -4,17 +4,17 @@
         <n-divider v-show="false" />
         <div class="content-wrapper">
             <div class="content">
-                <n-button></n-button>
                 <router-view></router-view>
             </div>
         </div>
     </n-config-provider>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { NConfigProvider, NDivider } from 'naive-ui'
 import AppBar from '@/components/AppBar/AppBar.vue'
 import theme from './theme'
+import { useAuthStore } from './stores/authStore'
 export default defineComponent({
     components: {
         NConfigProvider,
@@ -22,6 +22,11 @@ export default defineComponent({
         AppBar,
     },
     setup() {
+        const authStore = useAuthStore()
+        const created = async () => {
+            await authStore.checkAndLoadUser()
+        }
+        created()
         return { theme }
     },
 })

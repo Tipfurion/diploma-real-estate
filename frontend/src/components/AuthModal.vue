@@ -1,15 +1,15 @@
 <template>
-    <n-modal :show="showModal" @update-show="updateShow">
+    <n-modal :show="showModal" @update-show="updateShowModal">
         <div class="modal">
             <div class="modal__header">
-                <n-button class="close-btn" text :focusable="false" @click="updateShow(false)">
+                <n-button class="close-btn" text :focusable="false" @click="updateShowModal(false)">
                     <n-icon color="$light-gray-1">
                         <close-filled />
                     </n-icon>
                 </n-button>
             </div>
             <div class="modal__content">
-                <div v-if="state === 'login'" class="auth login">
+                <form @submit.prevent="login" v-if="state === 'login'" class="auth login">
                     <div class="form">
                         <div class="title-wrapper">
                             <n-h1>
@@ -23,6 +23,7 @@
                             placeholder="Номер телефона"
                             v-maska="'+7 (###) ###-##-##'"
                             size="large"
+                            @input="resetErrorMessage"
                         ></n-input>
                         <n-input
                             class="auth__input"
@@ -30,16 +31,28 @@
                             type="password"
                             placeholder="Пароль"
                             size="large"
+                            @input="resetErrorMessage"
                         ></n-input>
+                        <div v-if="isError" class="error-text__wrapper">
+                            <span class="error-text__text">{{ errorMessage }}</span>
+                        </div>
                         <div class="change-state-wrapper">
-                            <n-button class="auth-btn" type="primary" size="large">Войти </n-button>
+                            <n-button
+                                :loading="loading"
+                                attr-type="submit"
+                                @click="login"
+                                class="auth-btn"
+                                type="primary"
+                                size="large"
+                                >Войти
+                            </n-button>
                             <n-text class="change-state-text" type="primary" underline @click="changeState('register')">
                                 Зарегистрироваться
                             </n-text>
                         </div>
                     </div>
-                </div>
-                <div v-if="state === 'register'" class="auth register">
+                </form>
+                <form @submit.prevent="register" v-if="state === 'register'" class="auth register">
                     <div class="form">
                         <div class="title-wrapper">
                             <n-h1>
@@ -53,6 +66,8 @@
                             placeholder="Номер телефона"
                             v-maska="'+7 (###) ###-##-##'"
                             size="large"
+                            :status="isError"
+                            @input="resetErrorMessage"
                         ></n-input>
                         <n-input
                             class="auth__input"
@@ -60,6 +75,8 @@
                             type="password"
                             placeholder="Пароль"
                             size="large"
+                            :status="isError"
+                            @input="resetErrorMessage"
                         ></n-input>
                         <n-input
                             class="auth__input"
@@ -67,9 +84,20 @@
                             type="password"
                             placeholder="Повторите пароль"
                             size="large"
+                            :status="isError"
+                            @input="resetErrorMessage"
                         ></n-input>
+                        <div v-if="isError" class="error-text__wrapper">
+                            <span class="error-text__text">{{ errorMessage }}</span>
+                        </div>
                         <div class="change-state-wrapper">
-                            <n-button @click="register" class="auth-btn" type="primary" size="large"
+                            <n-button
+                                :loading="loading"
+                                attr-type="submit"
+                                @click="register"
+                                class="auth-btn"
+                                type="primary"
+                                size="large"
                                 >Зарегистрироваться
                             </n-button>
                             <n-text class="change-state-text" type="primary" underline @click="changeState('login')">
@@ -77,7 +105,7 @@
                             </n-text>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </n-modal>
@@ -85,10 +113,12 @@
 
 <script lang="ts">
 import { defineComponent, computed, ref, watch } from 'vue'
-import { NModal, NCard, NButton, NIcon, NInput, NText, NH1 } from 'naive-ui'
+import { NModal, NCard, NButton, NIcon, NInput, NText, NH1, NForm } from 'naive-ui'
+import { sanitizePhone } from '@/services/utils'
 import api from '@/api/index'
 type authState = 'login' | 'register'
 import { CloseFilled } from '@vicons/material'
+import { useAuthStore } from '../stores/authStore'
 export default defineComponent({
     components: {
         NModal,
@@ -106,29 +136,55 @@ export default defineComponent({
         },
     },
     setup(props, { emit }) {
+        const authStore = useAuthStore()
         const state = ref<authState>('login')
         const phone = ref('')
         const password = ref('')
         const repetedPassword = ref('')
-        const error = ref('')
-        const updateShow = (val: boolean) => {
+        const errorMessage = ref('')
+        const loading = ref(false)
+        const isError = computed(() => (errorMessage.value ? 'error' : undefined))
+        const updateShowModal = (val: boolean) => {
             emit('update:showModal', val)
         }
         const changeState = (val: authState) => {
+            errorMessage.value = ''
             phone.value = ''
             password.value = ''
             repetedPassword.value = ''
             state.value = val
         }
+        const resetErrorMessage = () => {
+            if (errorMessage.value) errorMessage.value = ''
+        }
         const register = async () => {
+            loading.value = true
             const { data, error } = await api.register({
-                phone: phone.value,
+                phone: sanitizePhone(phone.value),
                 password: password.value,
                 repeatedPassword: repetedPassword.value,
             })
             if (error) {
-                error.value = error
+                errorMessage.value = error.message
+            } else {
+                authStore.loadUser(data.token)
+                updateShowModal(false)
             }
+            loading.value = false
+        }
+        const login = async () => {
+            loading.value = true
+            const { data, error } = await api.login({
+                phone: sanitizePhone(phone.value),
+                password: password.value,
+            })
+            if (error) {
+                errorMessage.value = error.message
+            } else {
+                await authStore.loadUser(data.token)
+                updateShowModal(false)
+            }
+            loading.value = false
         }
         watch(
             () => props.showModal,
@@ -139,11 +195,25 @@ export default defineComponent({
                 })
             }
         )
-        return { updateShow, changeState, register, phone, password, repetedPassword, state }
+        return {
+            updateShowModal,
+            changeState,
+            register,
+            login,
+            resetErrorMessage,
+            loading,
+            phone,
+            password,
+            repetedPassword,
+            state,
+            isError,
+            errorMessage,
+        }
     },
 })
 </script>
 <style scoped lang="sass">
+@import '@/vars.sass'
 .modal
     border-radius: 4px
     background-color: white
@@ -178,4 +248,10 @@ export default defineComponent({
     font-size: 16px
 .auth-btn
     min-width: 150px
+.error-text
+    &__wrapper
+        margin-top: 4px
+        text-align: end
+    &__text
+        color: $error-color
 </style>

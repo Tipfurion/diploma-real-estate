@@ -5,11 +5,12 @@
             <div class="app-bar__content">
                 <div class="element-group left">1</div>
                 <div class="element-group right">
-                    <n-button v-if="!logged" type="primary" strong :focusable="false" @click="showAuthModal = true"
+                    <n-spin v-if="authStore.loading" size="medium" />
+                    <n-button v-else-if="!logged" type="primary" strong :focusable="false" @click="showAuthModal = true"
                         >ВОЙТИ</n-button
                     >
                     <n-avatar
-                        v-if="logged"
+                        v-else-if="logged"
                         round
                         size="large"
                         @click="() => {}"
@@ -30,17 +31,17 @@
 <script lang="ts">
 import { defineComponent, ref, toRefs } from 'vue'
 import { PersonOutlineFilled } from '@vicons/material'
-import { NAvatar, NIcon, NButton } from 'naive-ui'
+import { NAvatar, NIcon, NButton, NSpin } from 'naive-ui'
 import theme from '@/theme'
 import { useAuthStore } from '../../stores/authStore'
 import AuthModal from '../AuthModal.vue'
 export default defineComponent({
-    components: { NAvatar, NIcon, PersonOutlineFilled, NButton, AuthModal },
+    components: { NAvatar, NIcon, PersonOutlineFilled, NButton, AuthModal, NSpin },
     setup() {
         const authStore = useAuthStore()
         const { logged } = toRefs(authStore)
         const showAuthModal = ref(false)
-        return { theme, logged, showAuthModal }
+        return { theme, logged, showAuthModal, authStore }
     },
 })
 </script>

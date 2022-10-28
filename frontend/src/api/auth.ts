@@ -16,8 +16,7 @@ export const login = async (params: loginParams): Promise<{ data: any; error: an
     const res = await http.post('/auth/login', { ...params })
     return res.data
 }
-/* export const me = async (params: loginParams): Promise<{ data: any; error: any }> => {
-    const res = await http.get('/me', { ...params })
+export const me = async (token: string): Promise<{ data: any; error: any }> => {
+    const res = await http.get('/auth/me', { headers: { Authorization: `Bearer ${token}` } })
     return res.data
 }
- */

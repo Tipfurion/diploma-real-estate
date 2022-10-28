@@ -51,9 +51,12 @@ const authService = {
             const user = await db.user.create({
                 data: { passwordHash: hash, phoneNumber: phone },
             })
+            const token = jwt.sign(_.omit(user, ['passwordHash']), process.env.JWT_PRIVATE_KEY as string, {
+                expiresIn: process.env.JWT_EXPIRES_IN,
+            })
             return res.json({
                 error: null,
-                data: omit(user, ['passwordHash']),
+                data: { token },
             })
         } catch (err) {
             return res.status(500).json({

@@ -116,7 +116,6 @@ const authService = {
         try {
             const authHeader = req.headers['authorization']
             const token = authHeader!.replace('Bearer ', '')
-            console.log('authHeader', authHeader)
 
             if (token) {
                 try {

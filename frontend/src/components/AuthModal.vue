@@ -23,19 +23,23 @@
                             placeholder="Номер телефона"
                             v-maska="'+7 (###) ###-##-##'"
                             size="large"
+                            :status="isError"
                             @input="resetErrorMessage"
                         ></n-input>
                         <n-input
                             class="auth__input"
                             v-model:value="password"
                             type="password"
+                            show-password-on="click"
                             placeholder="Пароль"
                             size="large"
+                            :status="isError"
                             @input="resetErrorMessage"
                         ></n-input>
-                        <div v-if="isError" class="error-text__wrapper">
-                            <span class="error-text__text">{{ errorMessage }}</span>
+                        <div class="error-text__wrapper" :class="{ 'error-text__wrapper--hidden': !isError }">
+                            <span class="error-text__text">{{ errorMessage || '__' }}</span>
                         </div>
+                        <div class="spacer"></div>
                         <div class="change-state-wrapper">
                             <n-button
                                 :loading="loading"
@@ -73,6 +77,7 @@
                             class="auth__input"
                             v-model:value="password"
                             type="password"
+                            show-password-on="click"
                             placeholder="Пароль"
                             size="large"
                             :status="isError"
@@ -82,13 +87,14 @@
                             class="auth__input"
                             v-model:value="repetedPassword"
                             type="password"
+                            show-password-on="click"
                             placeholder="Повторите пароль"
                             size="large"
                             :status="isError"
                             @input="resetErrorMessage"
                         ></n-input>
-                        <div v-if="isError" class="error-text__wrapper">
-                            <span class="error-text__text">{{ errorMessage }}</span>
+                        <div class="error-text__wrapper" :class="{ 'error-text__wrapper--hidden': !isError }">
+                            <span class="error-text__text">{{ errorMessage || '__' }}</span>
                         </div>
                         <div class="change-state-wrapper">
                             <n-button
@@ -154,6 +160,10 @@ export default defineComponent({
             repetedPassword.value = ''
             state.value = val
         }
+        watch(
+            () => props.showModal,
+            () => changeState('login')
+        )
         const resetErrorMessage = () => {
             if (errorMessage.value) errorMessage.value = ''
         }
@@ -252,6 +262,10 @@ export default defineComponent({
     &__wrapper
         margin-top: 4px
         text-align: end
+        &--hidden
+            visibility: hidden
     &__text
         color: $error-color
+.spacer
+    height: 56px
 </style>

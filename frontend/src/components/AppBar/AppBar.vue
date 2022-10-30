@@ -9,19 +9,7 @@
                     <n-button v-else-if="!logged" type="primary" strong :focusable="false" @click="showAuthModal = true"
                         >ВОЙТИ</n-button
                     >
-                    <n-avatar
-                        v-else-if="logged"
-                        round
-                        size="large"
-                        @click="() => {}"
-                        :style="{
-                            backgroundColor: theme.common.primaryColor,
-                        }"
-                    >
-                        <n-icon>
-                            <person-outline-filled />
-                        </n-icon>
-                    </n-avatar>
+                    <profile v-else-if="logged" />
                 </div>
             </div>
         </div>
@@ -35,8 +23,9 @@ import { NAvatar, NIcon, NButton, NSpin } from 'naive-ui'
 import theme from '@/theme'
 import { useAuthStore } from '../../stores/authStore'
 import AuthModal from '../AuthModal.vue'
+import Profile from '../Profile.vue'
 export default defineComponent({
-    components: { NAvatar, NIcon, PersonOutlineFilled, NButton, AuthModal, NSpin },
+    components: { Profile, NAvatar, NIcon, PersonOutlineFilled, NButton, AuthModal, NSpin },
     setup() {
         const authStore = useAuthStore()
         const { logged } = toRefs(authStore)

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import api from '../api'
 export const useAuthStore = defineStore('auth', {
-    state: () => ({ user: null, loading: false }),
+    state: () => ({ user: null as any, loading: false }),
     getters: {
         logged: (state) => Boolean(state.user),
     },
@@ -31,6 +31,11 @@ export const useAuthStore = defineStore('auth', {
             }
 
             this.loadUser(token)
+        },
+        async logout() {
+            localStorage.removeItem('token')
+            localStorage.removeItem('tokenExpires')
+            this.user = null
         },
     },
 })

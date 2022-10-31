@@ -5,11 +5,36 @@
             <div class="app-bar__content">
                 <div class="element-group left">1</div>
                 <div class="element-group right">
-                    <n-spin v-if="authStore.loading" size="medium" />
-                    <n-button v-else-if="!logged" type="primary" strong :focusable="false" @click="showAuthModal = true"
-                        >ВОЙТИ</n-button
-                    >
-                    <profile v-else-if="logged" />
+                    <div class="element-group__menu">
+                        <NButton secondary type="primary">
+                            <template #icon>
+                                <n-icon>
+                                    <favorite-filled />
+                                </n-icon>
+                            </template>
+                            Избранное
+                        </NButton>
+                        <NButton type="primary" @click="router.push('/create-post')">
+                            <template #icon>
+                                <n-icon>
+                                    <plus-filled />
+                                </n-icon>
+                            </template>
+                            Разместить обьявление
+                        </NButton>
+                    </div>
+                    <div class="element-group__auth">
+                        <n-spin v-if="authStore.loading" size="medium" />
+                        <n-button
+                            v-else-if="!logged"
+                            type="primary"
+                            strong
+                            :focusable="false"
+                            @click="showAuthModal = true"
+                            >ВОЙТИ</n-button
+                        >
+                        <profile v-else-if="logged" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -18,19 +43,20 @@
 
 <script lang="ts">
 import { defineComponent, ref, toRefs } from 'vue'
-import { PersonOutlineFilled } from '@vicons/material'
+import { PersonOutlineFilled, PlusFilled, FavoriteFilled } from '@vicons/material'
 import { NAvatar, NIcon, NButton, NSpin } from 'naive-ui'
 import theme from '@/theme'
 import { useAuthStore } from '../../stores/authStore'
 import AuthModal from '../AuthModal.vue'
 import Profile from '../Profile.vue'
+import router from '../../routes'
 export default defineComponent({
-    components: { Profile, NAvatar, NIcon, PersonOutlineFilled, NButton, AuthModal, NSpin },
+    components: { Profile, NAvatar, NIcon, PersonOutlineFilled, PlusFilled, FavoriteFilled, NButton, AuthModal, NSpin },
     setup() {
         const authStore = useAuthStore()
         const { logged } = toRefs(authStore)
         const showAuthModal = ref(false)
-        return { theme, logged, showAuthModal, authStore }
+        return { theme, logged, showAuthModal, authStore, router }
     },
 })
 </script>
@@ -59,4 +85,10 @@ export default defineComponent({
     display: flex
     justify-content: space-between
     align-items: center
+    &__menu
+        button
+            margin-left: 8px
+            margin-right: 8px
+            &:last-child
+                margin-right: 36px
 </style>

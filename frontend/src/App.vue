@@ -36,6 +36,7 @@ export default defineComponent({
     max-width: 1016px
     flex-grow: 1
     padding-top: 56px
+    margin-top: 56px
 .content-wrapper
     flex-grow: 1
     display: flex

@@ -6,7 +6,7 @@
                 <div class="element-group left">1</div>
                 <div class="element-group right">
                     <div class="element-group__menu">
-                        <NButton secondary type="primary">
+                        <NButton secondary type="primary" :disabled="!logged" :title="controlHoverText">
                             <template #icon>
                                 <n-icon>
                                     <favorite-filled />
@@ -14,7 +14,12 @@
                             </template>
                             Избранное
                         </NButton>
-                        <NButton type="primary" @click="router.push('/create-post')">
+                        <NButton
+                            type="primary"
+                            @click="router.push('/create-post')"
+                            :disabled="!logged"
+                            :title="controlHoverText"
+                        >
                             <template #icon>
                                 <n-icon>
                                     <plus-filled />
@@ -42,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, toRefs } from 'vue'
+import { computed, defineComponent, ref, toRefs } from 'vue'
 import { PersonOutlineFilled, PlusFilled, FavoriteFilled } from '@vicons/material'
 import { NAvatar, NIcon, NButton, NSpin } from 'naive-ui'
 import theme from '@/theme'
@@ -56,7 +61,8 @@ export default defineComponent({
         const authStore = useAuthStore()
         const { logged } = toRefs(authStore)
         const showAuthModal = ref(false)
-        return { theme, logged, showAuthModal, authStore, router }
+        const controlHoverText = computed(() => (logged.value ? '' : 'Войдите в аккаунт'))
+        return { theme, logged, showAuthModal, authStore, router, controlHoverText }
     },
 })
 </script>

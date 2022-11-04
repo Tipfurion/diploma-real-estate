@@ -1,2 +1,3 @@
 import * as auth from './auth'
-export default { ...auth }
+import * as post from './post'
+export default { ...auth, ...post }

@@ -8,7 +8,7 @@
             v-for="postType in postTypes"
             :key="postType.value"
             size="large"
-            @click="setPostType"
+            @click="setPostType(postType.value as 'sell' | 'rent')"
         >
             {{ postType.label }}
         </n-button>
@@ -18,17 +18,12 @@
 <script lang="ts">
 import { defineComponent, computed, ref, watch } from 'vue'
 import { NButton } from 'naive-ui'
-import { CloseFilled } from '@vicons/material'
 import theme from '../../../theme'
 import { useCreatePostStore } from '../../../stores/createPostStore'
 
 export default defineComponent({
     components: { NButton },
-    props: {
-        showModal: {
-            type: Boolean,
-        },
-    },
+    props: {},
     setup(props, { emit }) {
         const postTypes = ref([
             { label: 'Продажа', value: 'sell' },

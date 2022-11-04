@@ -1,5 +1,12 @@
 <template>
-    <n-dropdown placement="bottom-start" size="large" trigger="click" :options="actions" @select="handleActionSelect">
+    <n-dropdown
+        placement="bottom-start"
+        size="large"
+        trigger="click"
+        :options="actions"
+        @select="handleActionSelect"
+        :width="160"
+    >
         <div class="profile">
             <span class="profile__phone">{{ maskedPhone }}</span>
             <n-avatar

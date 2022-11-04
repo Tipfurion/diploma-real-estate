@@ -1,5 +1,6 @@
 require('dotenv').config()
 import authRouter from './routes/auth'
+import geoRouter from './routes/geo'
 async function main() {
     const express = require('express')
     const cors = require('cors')
@@ -7,6 +8,7 @@ async function main() {
     app.use(cors())
     app.use(express.json({ limit: '2mb' }))
     app.use('/auth', authRouter)
+    app.use('/geo', geoRouter)
     app.listen(3000)
 }
 

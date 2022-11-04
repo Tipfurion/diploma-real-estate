@@ -16,6 +16,7 @@ const router = VueRouter.createRouter({
 
 const protectedPaths = routes.filter((el) => el.authRequired).map((el) => el.path)
 router.beforeEach((to, from, next) => {
+    return next()
     const authStore = useAuthStore()
     if (protectedPaths.includes(to.path) && !authStore.logged) next('/')
     else next()

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <n-form-item :feedback="'fesfdsfdsfds'" :validation-status="'error'">
+        <n-form-item :feedback="errorText" :validation-status="selectStatus">
             <n-select
                 v-model:value="address"
                 filterable
@@ -13,7 +13,9 @@
             >
                 <template #empty> <span class="empty-text">Нет данных.</span> </template>
             </n-select>
-            <n-button type="primary" class="next-step-button">Далее</n-button>
+            <n-button @click="nextStep" :disabled="!addressValid" type="primary" class="next-step-button"
+                >Далее</n-button
+            >
         </n-form-item>
         <yandex-map
             v-if="coords?.length"
@@ -23,6 +25,16 @@
             :coordinates="coords"
             :zoom="17"
         >
+            <yandex-marker
+                v-if="coords?.length"
+                :coordinates="coords"
+                :marker-id="'current-address'"
+                :options="{
+                    preset: 'islands#circleIcon',
+                    iconColor: theme.common.primaryColor,
+                }"
+            >
+            </yandex-marker>
         </yandex-map>
     </div>
 </template>
@@ -35,9 +47,10 @@ import theme from '../../../theme'
 import { useCreatePostStore } from '../../../stores/createPostStore'
 import api from '../../../api'
 import * as _ from 'lodash'
+declare module 'vue-yandex-maps'
 import { yandexMap, ymapMarker } from 'vue-yandex-maps'
 export default defineComponent({
-    components: { NButton, NSelect, NFormItem, NForm, yandexMap },
+    components: { NButton, NSelect, NFormItem, NForm, yandexMap, ymapMarker },
     props: {},
     setup(props, { emit }) {
         const formValue = ref()
@@ -46,9 +59,12 @@ export default defineComponent({
         const address = ref()
         const suggestions = ref<any[]>([])
         const createPostStore = useCreatePostStore()
+        const errorText = ref('')
+        const selectStatus = computed(() => (errorText.value ? 'error' : undefined))
         const addressData = computed(() =>
             address.value ? suggestions.value.find((el: any) => el.value === address.value)?.data : null
         )
+        const addressValid = computed(() => Boolean(addressData.value?.house))
 
         const coords = computed(() => (addressData.value ? [addressData.value.geo_lat, addressData.value.geo_lon] : []))
         const handleSearch = _.debounce(async (query: string) => {
@@ -62,7 +78,43 @@ export default defineComponent({
                 .then((res) => res.data.map((el: any) => ({ ...el, label: el.value })))
             suggestionsLoading.value = false
         }, 150)
-        return { suggestions, suggestionsLoading, address, handleSearch, coords, mapSettings, addressData, formValue }
+        watch(addressData, (v) => {
+            if (!v) {
+                errorText.value = ''
+                return
+            }
+            if (!v.house) {
+                errorText.value = 'Адрес не содержит номер дома'
+            }
+        })
+
+        const nextStep = () => {
+            createPostStore.setPostProps({
+                address: address.value,
+                country: addressData.value.country,
+                city: addressData.value.city,
+                house: addressData.value.house,
+                geoLat: addressData.value.geo_lat,
+                geoLon: addressData.value.geo_lon,
+            })
+            createPostStore.nextStep()
+        }
+
+        return {
+            suggestions,
+            suggestionsLoading,
+            address,
+            handleSearch,
+            coords,
+            mapSettings,
+            addressData,
+            formValue,
+            errorText,
+            selectStatus,
+            theme,
+            addressValid,
+            nextStep,
+        }
     },
 })
 </script>

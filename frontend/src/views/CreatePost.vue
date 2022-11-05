@@ -28,7 +28,8 @@ import {
 import theme from '@/theme'
 import { useCreatePostStore } from '../stores/createPostStore'
 import PostTypeStep from '@/components/CreatePost/Steps/PostTypeStep.vue'
-import AdressStep from '@/components/CreatePost/Steps/AddressStep.vue'
+import AddressStep from '@/components/CreatePost/Steps/AddressStep.vue'
+import InfoStep from '@/components/CreatePost/Steps/InfoStep.vue'
 export default defineComponent({
     components: {
         NAvatar,
@@ -52,7 +53,9 @@ export default defineComponent({
                 case 1:
                     return PostTypeStep
                 case 2:
-                    return AdressStep
+                    return AddressStep
+                case 3:
+                    return InfoStep
                 default:
                     break
             }

@@ -1,6 +1,4 @@
 import { defineStore } from 'pinia'
-import api from '../api'
-import router from '@/routes/index'
 export const useCreatePostStore = defineStore('createPost', {
     state: () => ({
         post: {
@@ -11,6 +9,7 @@ export const useCreatePostStore = defineStore('createPost', {
             house: '11',
             geoLat: '55.76056',
             geoLon: '37.609811',
+            flat: undefined,
             rooms: undefined,
             square: undefined,
             floor: undefined,

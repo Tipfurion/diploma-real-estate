@@ -23,7 +23,7 @@
             v-show="address"
             :controls="mapSettings.controls"
             :coordinates="coords"
-            :zoom="17"
+            :zoom="16"
         >
             <yandex-marker
                 v-if="coords?.length"

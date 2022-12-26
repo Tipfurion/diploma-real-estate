@@ -30,6 +30,8 @@ import { useCreatePostStore } from '../stores/createPostStore'
 import PostTypeStep from '@/components/CreatePost/Steps/PostTypeStep.vue'
 import AddressStep from '@/components/CreatePost/Steps/AddressStep.vue'
 import InfoStep from '@/components/CreatePost/Steps/InfoStep.vue'
+import PriceStep from '@/components/CreatePost/Steps/PriceStep.vue'
+import NameAndDescriptionStep from '@/components/CreatePost/Steps/NameAndDescriptionStep.vue'
 export default defineComponent({
     components: {
         NAvatar,
@@ -56,6 +58,10 @@ export default defineComponent({
                     return AddressStep
                 case 3:
                     return InfoStep
+                case 4:
+                    return PriceStep
+                case 5:
+                    return NameAndDescriptionStep
                 default:
                     break
             }
@@ -67,7 +73,7 @@ export default defineComponent({
 
 <style scoped lang="sass">
 @import '@/vars.sass'
-::v-deep .n-steps
+:deep .n-steps
     margin-top: 36px
 .step
     margin-top: 56px

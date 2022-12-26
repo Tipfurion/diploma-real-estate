@@ -9,7 +9,7 @@
                     label-placement="left"
                     :style="{ width: '450px' }"
                 >
-                    <n-form-item label="Квартира" path="info.flat" required>
+                    <n-form-item label="Квартира" path="info.flat">
                         <n-input-number
                             class="input"
                             v-model:value="info.flat"
@@ -27,7 +27,7 @@
                         />
                     </n-form-item>
                     <n-form-item label="Общая площадь" path="info.square" required>
-                        <n-input class="input" v-model:value="info.square" :placeholder="placeholder" />
+                        <n-input-number class="input" v-model:value="info.square" :placeholder="placeholder" />
                         <div :style="{ marginLeft: '12px' }">
                             <span>м<sup>2</sup></span>
                         </div>
@@ -103,6 +103,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const createPostStore = useCreatePostStore()
         const placeholder = ref('Не выбрано')
+        const notRequiredFields = ['flat']
         const info = ref<any>({
             flat: null,
             rooms: null,
@@ -114,8 +115,22 @@ export default defineComponent({
         const fileLoaded = (e: any) => {
             info.value.fileList = e.fileList
         }
-        const formValid = computed(() => Object.keys(info.value).every((key: string) => !_.isNil(info.value[key])))
-        const nextStep = () => {}
+        const formValid = computed(() =>
+            Object.keys(info.value)
+                .filter((key) => !notRequiredFields.includes(key))
+                .every((key: string) => !_.isNil(info.value[key]))
+        )
+        const nextStep = () => {
+            createPostStore.setPostProps({
+                flat: info.value.flat,
+                rooms: info.value.rooms,
+                square: info.value.square,
+                floor: info.value.floor,
+                maxFloor: info.value.maxFloor,
+                fileList: info.value.fileList,
+            })
+            createPostStore.nextStep()
+        }
         const roomsOptions = ref([
             { value: '1', label: '1' },
             { value: '2', label: '2' },
@@ -149,12 +164,12 @@ export default defineComponent({
         justify-content:  flex-end
 .next-step-button
     width: 160px
-::v-deep .n-upload-trigger.n-upload-trigger--image-card
+:deep .n-upload-trigger.n-upload-trigger--image-card
     width: 124px
     height: 124px
-::v-deep .n-upload-file-list .n-upload-file.n-upload-file--image-card-type
+:deep .n-upload-file-list .n-upload-file.n-upload-file--image-card-type
     width: 124px
     height: 124px
-::v-deep .n-upload-file-list.n-upload-file-list--grid
+:deep .n-upload-file-list.n-upload-file-list--grid
     grid-template-columns: repeat(auto-fill, 124px)
 </style>

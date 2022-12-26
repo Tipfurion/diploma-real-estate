@@ -16,6 +16,8 @@ export const useCreatePostStore = defineStore('createPost', {
             maxFloor: 9,
             price: 25000,
             pricePeriod: 'month',
+            name: null,
+            description: null,
         } as any,
         initSteps: [
             { id: 1, title: 'Тип обьявления', disabled: false },
@@ -37,6 +39,9 @@ export const useCreatePostStore = defineStore('createPost', {
         },
         nextStep() {
             this.currentStepId++
+        },
+        createPost() {
+            //api call
         },
     },
 })

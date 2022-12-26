@@ -27,8 +27,12 @@
                 </n-form>
             </div>
             <div class="form-wrapper__next-btn-wrapper">
-                <n-button @click="nextStep" :disabled="!formValid" type="primary" class="next-step-button"
-                    >Далее</n-button
+                <n-button
+                    @click="createPostStore.createPost"
+                    :disabled="!formValid"
+                    type="primary"
+                    class="next-step-button"
+                    >Завершить</n-button
                 >
             </div>
         </div>
@@ -60,29 +64,17 @@ export default defineComponent({
             name: '',
             description: '',
         })
-        const formatCurrency = (value: number | null) => {
-            if (value === null) return ''
-            return `${value.toLocaleString('ru-RU')} ₽`
-        }
-        const parseCurrency = (input: string) => {
-            const nums = input.replace(/(,|\₽|\s)/g, '').trim()
-            if (/^\d+(\.(\d+)?)?$/.test(nums)) return Number(nums)
-            return nums === '' ? null : Number.NaN
-        }
+
         const formValid = computed(() => {
             const requiredKeys = ['name']
-            return requiredKeys.every((key: string) => !_.isNil(info.value[key]))
+            return requiredKeys.every((key: string) => info.value[key])
         })
-        const nextStep = () => {}
 
         return {
             createPostStore,
             placeholder,
-            nextStep,
             info,
             formValid,
-            formatCurrency,
-            parseCurrency,
         }
     },
 })

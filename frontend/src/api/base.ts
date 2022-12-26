@@ -5,3 +5,10 @@ export const http = axios.create({
     timeout: 10 * 1000,
     validateStatus: (status) => true,
 })
+
+http.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token')
+    config.headers!.Authorization = `Bearer ${token}`
+    config.headers!.Accept = 'application/json'
+    return config
+})

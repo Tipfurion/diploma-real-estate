@@ -19,4 +19,30 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime? @updatedAt
   deletedAt    DateTime?
+  Post         Post[]
+}
+
+model Post {
+  id          Int       @id @default(autoincrement())
+  ownerId     Int
+  owner       User      @relation(fields: [ownerId], references: [id])
+  address     String
+  country     String
+  city        String
+  flat        Int
+  floor       Int
+  maxFloor    Int
+  geoLat      String
+  geoLon      String
+  house       String
+  name        String
+  description String
+  price       Int
+  pricePeriod String
+  rooms       String
+  square      Int
+  type        String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+  deletedAt   DateTime?
 }

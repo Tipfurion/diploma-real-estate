@@ -6,3 +6,7 @@ export const getAdressSuggestions = async (params: getAdressSuggestionsParams): 
     const res = await http.get(`/geo/address/suggest?query=${params.query}`)
     return res.data
 }
+export const createPost = async (params: getAdressSuggestionsParams): Promise<{ data: any; error: any }> => {
+    const res = await http.get(`/geo/address/suggest?query=${params.query}`)
+    return res.data
+}

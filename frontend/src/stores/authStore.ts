@@ -9,10 +9,10 @@ export const useAuthStore = defineStore('auth', {
     actions: {
         async loadUser(token: string) {
             this.loading = true
-            const { data, error } = await api.me(token)
-            this.user = data
             localStorage.setItem('token', token)
+            const { data, error } = await api.me()
             localStorage.setItem('tokenExpires', String(data.exp * 1000))
+            this.user = data
 
             this.loading = false
         },

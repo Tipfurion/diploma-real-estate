@@ -42,7 +42,18 @@ model Post {
   rooms       String
   square      Int
   type        String
+  Media       Media[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
   deletedAt   DateTime?
+}
+
+model Media {
+  id        Int       @id @default(autoincrement())
+  url       String
+  post      Post      @relation(fields: [postId], references: [id])
+  postId    Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
 }

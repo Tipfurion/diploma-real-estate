@@ -6,5 +6,6 @@
       "lib": ["esnext"],
       "esModuleInterop": true
     },
-    "files":["./@types/index.d.ts"]
+    
+    "files":["./index.d.ts"]
   }

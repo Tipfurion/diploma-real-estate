@@ -1,13 +1,14 @@
 import { Request, Response } from 'express'
 import * as _ from 'lodash'
 import db from '../../db/db'
-const postService = {
-    create: async (req: Request, res: Response) => {
+import { RequestWithUser } from '../types/index'
+const postController = {
+    create: async (req: RequestWithUser, res: Response) => {
         const post = req.body.post
         const user = req.user
         try {
             const createdPost = await db.post.create({
-                data: { ...post, owner: { connect: { id: user.id } } },
+                data: { ...(_.omit(post, 'files') as any), owner: { connect: { id: user.id } } },
             })
             return res.json({
                 error: null,
@@ -39,4 +40,4 @@ const postService = {
         }
     },
 }
-export default postService
+export default postController

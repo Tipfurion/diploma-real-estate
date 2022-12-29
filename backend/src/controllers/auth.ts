@@ -7,7 +7,7 @@ import db from '../../db/db'
 import { omit, omitBy } from 'lodash'
 const SALT_ROUNDS = 10
 
-const authService = {
+const authController = {
     register: async (req: Request, res: Response) => {
         try {
             let { password, repeatedPassword, phone } = req.body
@@ -142,4 +142,4 @@ const authService = {
         }
     },
 }
-export default authService
+export default authController

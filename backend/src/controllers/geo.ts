@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import * as _ from 'lodash'
 import axios from 'axios'
-const geoService = {
+const geoController = {
     getAddressSuggestions: async (req: Request, res: Response) => {
         try {
             let { query } = req.query
@@ -25,4 +25,4 @@ const geoService = {
         }
     },
 }
-export default geoService
+export default geoController

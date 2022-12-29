@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import api from '../api'
 export const useCreatePostStore = defineStore('createPost', {
     state: () => ({
         post: {
@@ -18,6 +19,7 @@ export const useCreatePostStore = defineStore('createPost', {
             pricePeriod: 'month',
             name: null,
             description: null,
+            fileList: [],
         } as any,
         initSteps: [
             { id: 1, title: 'Тип обьявления', disabled: false },
@@ -40,8 +42,9 @@ export const useCreatePostStore = defineStore('createPost', {
         nextStep() {
             this.currentStepId++
         },
-        createPost() {
-            //api call
+        async createPost() {
+            const res = await api.createPost({ post: this.post })
+            return res
         },
     },
 })

@@ -42,7 +42,7 @@ model Post {
   rooms       String
   square      Int
   type        String
-  Media       Media[]
+  media       Media[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
   deletedAt   DateTime?

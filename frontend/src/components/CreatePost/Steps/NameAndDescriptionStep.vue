@@ -28,7 +28,8 @@
             </div>
             <div class="form-wrapper__next-btn-wrapper">
                 <n-button
-                    @click="createPostStore.createPost"
+                    :loading="loading"
+                    @click="createPost"
                     :disabled="!formValid"
                     type="primary"
                     class="next-step-button"
@@ -44,6 +45,7 @@ import { defineComponent, computed, ref, watch } from 'vue'
 import { NButton, NSelect, NFormItem, NForm, NInput, NInputNumber, NText, NIcon } from 'naive-ui'
 import theme from '../../../theme'
 import { useCreatePostStore } from '../../../stores/createPostStore'
+import { useNotification } from 'naive-ui'
 import * as _ from 'lodash'
 export default defineComponent({
     components: {
@@ -58,6 +60,8 @@ export default defineComponent({
     },
     props: {},
     setup(props, { emit }) {
+        const loading = ref(false)
+        const notification = useNotification()
         const createPostStore = useCreatePostStore()
         const placeholder = ref('Не выбрано')
         const info = ref<any>({
@@ -69,12 +73,30 @@ export default defineComponent({
             const requiredKeys = ['name']
             return requiredKeys.every((key: string) => info.value[key])
         })
+        const createPost = async () => {
+            loading.value = true
+            createPostStore.setPostProps({
+                name: info.value.name,
+                description: info.value.description,
+            })
+            const { data, error } = await createPostStore.createPost()
+            const notificationText = error ? 'Ошибка при создании объявления' : 'Обьявление создано!'
+            const notificationType = error ? 'error' : 'success'
+            notification[notificationType]({
+                content: notificationText,
+                duration: 3500,
+                keepAliveOnHover: true,
+            })
+            loading.value = false
+        }
 
         return {
             createPostStore,
             placeholder,
             info,
             formValid,
+            loading,
+            createPost,
         }
     },
 })

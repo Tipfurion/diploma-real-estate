@@ -11,12 +11,15 @@ async function main() {
     const app = express()
     app.use(cors())
     app.use(express.json({ limit: '2mb' }))
-    app.use(fileUpload())
+    app.use(fileUpload({}))
 
     app.use('/auth', authRouter)
     app.use('/geo', geoRouter)
     app.use('/post', postRouter)
 
+    app.use(function (err: any, req: any, res: any, next: any) {
+        res.status(500).send(err.message)
+    })
     app.listen(3000)
 }
 

@@ -1,17 +1,19 @@
 <template>
     <n-config-provider :theme-overrides="theme">
-        <app-bar />
-        <n-divider v-show="false" />
-        <div class="content-wrapper">
-            <div class="content">
-                <router-view></router-view>
+        <n-notification-provider>
+            <app-bar />
+            <n-divider v-show="false" />
+            <div class="content-wrapper">
+                <div class="content">
+                    <router-view></router-view>
+                </div>
             </div>
-        </div>
+        </n-notification-provider>
     </n-config-provider>
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { NConfigProvider, NDivider } from 'naive-ui'
+import { NConfigProvider, NDivider, NNotificationProvider } from 'naive-ui'
 import AppBar from '@/components/AppBar/AppBar.vue'
 import theme from './theme'
 import { useAuthStore } from './stores/authStore'
@@ -20,6 +22,7 @@ export default defineComponent({
         NConfigProvider,
         NDivider,
         AppBar,
+        NNotificationProvider,
     },
     setup() {
         const authStore = useAuthStore()

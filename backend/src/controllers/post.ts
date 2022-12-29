@@ -5,13 +5,16 @@ import mediaService from '../services/media'
 import { ExtendedRequest } from '../types/index'
 const postController = {
     create: async (req: ExtendedRequest, res: Response) => {
-        console.log('req.files', req.body)
-        console.log('req.files', req.files)
-        const post = req.body.post
-        const user = req.user!
         try {
+            const post = JSON.parse(req.body.post)
+            const user = req.user!
+            const createdMedia = await mediaService.createMedia(Object.values(req.files ?? []))
+
             const createdPost = await db.post.create({
                 data: { ...(_.omit(post, 'files') as any), owner: { connect: { id: user.id } } },
+            })
+            await db.media.createMany({
+                data: createdMedia.map((media) => ({ url: media.url, postId: createdPost.id })) as any,
             })
             return res.json({
                 error: null,
@@ -29,7 +32,7 @@ const postController = {
         const id = Number(req.query.id)
         try {
             mediaService.createMedia([])
-            const post = await db.post.findFirst({ where: { id }, include: { owner: true } })
+            const post = await db.post.findFirst({ where: { id }, include: { owner: true, media: true } })
             post!.owner = _.omit(post!.owner as any, 'passwordHash') as any
             return res.json({
                 error: null,

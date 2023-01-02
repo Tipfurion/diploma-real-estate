@@ -7,8 +7,15 @@ interface getAdressSuggestionsParams {
 interface createPostParams {
     post: any
 }
+interface getOnePostParams {
+    id: number
+}
 export const getAdressSuggestions = async (params: getAdressSuggestionsParams): Promise<{ data: any; error: any }> => {
     const res = await http.get(`/geo/address/suggest?query=${params.query}`)
+    return res.data
+}
+export const getOnePost = async (params: getOnePostParams): Promise<{ data: any; error: any }> => {
+    const res = await http.get(`/post/get-one?id=${params.id}`)
     return res.data
 }
 export const createPost = async (params: createPostParams): Promise<{ data: any; error: any }> => {

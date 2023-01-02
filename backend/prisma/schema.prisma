@@ -38,7 +38,7 @@ model Post {
   name        String
   description String
   price       Int
-  pricePeriod String
+  pricePeriod String?
   rooms       String
   square      Int
   type        String

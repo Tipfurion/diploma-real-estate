@@ -2,10 +2,12 @@ import * as VueRouter from 'vue-router'
 import HelloWorld from '@/components/HelloWorld.vue'
 import { useAuthStore } from '../stores/authStore'
 const CreatePost = () => import('@/views/CreatePost.vue')
+const Post = () => import('@/views/Post.vue')
 const Home = { template: '<div>Home</div>' }
 
 const routes = [
     { path: '/', component: Home, authRequired: false },
+    { path: '/post/:postId', component: Post, authRequired: false },
     { path: '/create-post', component: CreatePost, authRequired: true },
 ]
 

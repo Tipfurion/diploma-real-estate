@@ -75,7 +75,7 @@ export default defineComponent({
             suggestionsLoading.value = true
             suggestions.value = await api
                 .getAdressSuggestions({ query })
-                .then((res) => res.data.map((el: any) => ({ ...el, label: el.value })))
+                .then((res: any) => res.data.map((el: any) => ({ ...el, label: el.value })))
             suggestionsLoading.value = false
         }, 150)
         watch(addressData, (v) => {

@@ -8,6 +8,8 @@ const postController = {
         try {
             const post = JSON.parse(req.body.post)
             const user = req.user!
+            console.log('post', post)
+            console.log('user', user)
             const createdMedia = await mediaService.createMedia(Object.values(req.files ?? []))
 
             const createdPost = await db.post.create({
@@ -33,7 +35,9 @@ const postController = {
         try {
             mediaService.createMedia([])
             const post = await db.post.findFirst({ where: { id }, include: { owner: true, media: true } })
-            post!.owner = _.omit(post!.owner as any, 'passwordHash') as any
+            if (post) {
+                post!.owner = _.omit(post!.owner as any, 'passwordHash') as any
+            }
             return res.json({
                 error: null,
                 data: post,

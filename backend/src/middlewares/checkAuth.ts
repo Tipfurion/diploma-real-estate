@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-
-export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
+import { ExtendedRequest } from '../types/index'
+export const checkAuth = (req: ExtendedRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers['authorization']
     if (!authHeader) {
         return res.status(403).json({

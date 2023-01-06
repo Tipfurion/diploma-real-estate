@@ -19,7 +19,8 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime? @updatedAt
   deletedAt    DateTime?
-  Post         Post[]
+  posts        Post[]
+  comments     Comment[]
 }
 
 model Post {
@@ -43,6 +44,7 @@ model Post {
   square      Int
   type        String
   media       Media[]
+  comments    Comment[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
   deletedAt   DateTime?
@@ -53,6 +55,19 @@ model Media {
   url       String
   post      Post      @relation(fields: [postId], references: [id])
   postId    Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  ownerId   Int
+  owner     User      @relation(fields: [ownerId], references: [id])
+  postId    Int
+  post      Post      @relation(fields: [postId], references: [id])
+  text      String
+  replyToId Int?
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   deletedAt DateTime?

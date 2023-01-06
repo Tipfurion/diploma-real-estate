@@ -51,6 +51,7 @@
                             >
                             </yandex-marker>
                         </yandex-map>
+                        <comments class="post__comments" :postId="post.id" />
                     </div>
                 </div>
                 <div class="grid-item">
@@ -128,6 +129,7 @@ import api from '../api'
 import { useRoute } from 'vue-router'
 import { Post } from '../types'
 import MediaGallery from '@/components/Post/MediaGallery.vue'
+import Comments from '@/components/Post/Comments.vue'
 export default defineComponent({
     components: {
         NSpace,
@@ -139,6 +141,7 @@ export default defineComponent({
         NIcon,
         WhatsappFilled,
         TelegramFilled,
+        Comments,
         yandexMap,
         ymapMarker,
     },
@@ -247,6 +250,8 @@ export default defineComponent({
         &__label
             font-size: 16px
             font-weight: 600
+    &__comments
+        margin-top: 24px
 
 .map
     width: 100%

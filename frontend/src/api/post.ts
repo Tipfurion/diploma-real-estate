@@ -10,6 +10,10 @@ interface createPostParams {
 interface getOnePostParams {
     id: number
 }
+interface getPostComments {
+    postId: number
+}
+interface createCommentParams {}
 export const getAdressSuggestions = async (params: getAdressSuggestionsParams): Promise<{ data: any; error: any }> => {
     const res = await http.get(`/geo/address/suggest?query=${params.query}`)
     return res.data
@@ -29,5 +33,13 @@ export const createPost = async (params: createPostParams): Promise<{ data: any;
             'Content-Type': 'multipart/form-data',
         },
     })
+    return res.data
+}
+export const getPostComments = async (params: getPostComments): Promise<{ data: any; error: any }> => {
+    const res = await http.get(`/post/comments?postId=${params.postId}`)
+    return res.data
+}
+export const createComment = async (params: createCommentParams): Promise<{ data: any; error: any }> => {
+    const res = await http.post('/post/comment', { ...params })
     return res.data
 }

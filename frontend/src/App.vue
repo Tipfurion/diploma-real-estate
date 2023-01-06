@@ -40,6 +40,7 @@ export default defineComponent({
     flex-grow: 1
     padding-top: 56px
     margin-top: 32px
+    margin-bottom: 146px
 .content-wrapper
     flex-grow: 1
     display: flex
